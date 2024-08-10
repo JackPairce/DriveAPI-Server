@@ -1,6 +1,6 @@
 bin
+test
 
 .env
 credentials.json
 token.json
-test
