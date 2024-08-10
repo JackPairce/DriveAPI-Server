@@ -7,4 +7,4 @@ build:
 run:
 	@./bin/server
 
-dev: build run
+start: build run

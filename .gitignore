@@ -1,0 +1,6 @@
+bin
+
+.env
+credentials.json
+token.json
+test
