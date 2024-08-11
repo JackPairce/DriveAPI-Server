@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/api/drive/v3"
 )
 
@@ -84,8 +85,8 @@ func ReadFile(w http.ResponseWriter, r *http.Request) {
 }
 
 type Payload struct {
-	HashedPassword string  `json:"password"`
-	DataBuffer     *[]byte `json:"data"`
+	Password   string  `json:"password"`
+	DataBuffer *[]byte `json:"data"`
 }
 
 func (S *Server) WriteFile(w http.ResponseWriter, r *http.Request) {
@@ -113,7 +114,6 @@ func (S *Server) WriteFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "Write File ID: %s\n", file.Id)
-
 }
 
 func checkCredentials(r *http.Request, payload *Payload, w http.ResponseWriter) bool {
@@ -122,9 +122,18 @@ func checkCredentials(r *http.Request, payload *Payload, w http.ResponseWriter) 
 		fmt.Fprintf(w, "Error Reading Request Body: %s\n", err)
 		return true
 	}
-	if payload.HashedPassword != os.Getenv("PASSWORD") {
-		fmt.Fprintf(w, "Incorrect Password\n")
+	storedHash := os.Getenv("PASSWORD")
+	if storedHash == "" {
+		http.Error(w, "No stored password hash found", http.StatusInternalServerError)
 		return true
 	}
-	return false
+
+	// Compare the hashed password
+	if err := bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(payload.Password)); err != nil {
+		fmt.Fprintf(w, "Password does not match")
+		return true
+	} else {
+		fmt.Fprintf(w, "Password matches")
+		return false
+	}
 }
