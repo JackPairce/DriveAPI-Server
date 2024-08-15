@@ -17,24 +17,6 @@ type Server struct {
 }
 
 func (S *Server) ResetToken(w http.ResponseWriter, r *http.Request) {
-	// TODO: Reset the token
-
-	switch r.Method {
-	case "GET":
-	case "POST":
-		var payload Payload
-		if checkCredentials(r, &payload, w) {
-			return
-		}
-		// save data as credentials.json
-		if err := ioutil.WriteFile("credentials.json", *payload.DataBuffer, 0600); err != nil {
-			fmt.Fprint(w, "Error Saving Credentials")
-			return
-		}
-	default:
-		fmt.Fprint(w, "Method Not Allowed")
-	}
-
 	authCode := r.URL.Query().Get("code")
 	if authCode != "" {
 		if S.MyDrive.authURL != "" {

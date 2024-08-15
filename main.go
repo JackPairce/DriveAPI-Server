@@ -13,7 +13,7 @@ func main() {
 	S := Server{
 		MyDrive: DriveService{},
 	}
-	// S.MyDrive.InitDriveService()
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
